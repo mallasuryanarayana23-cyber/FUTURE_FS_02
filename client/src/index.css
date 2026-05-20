@@ -1,0 +1,46 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply font-sans bg-secondary-50 text-secondary-900 transition-colors duration-200 dark:bg-secondary-950 dark:text-secondary-100;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-white rounded-xl shadow-sm border border-secondary-200 overflow-hidden dark:bg-secondary-900 dark:border-secondary-800;
+  }
+  
+  .btn-primary {
+    @apply px-4 py-2 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition-all duration-200 focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
+  }
+
+  .btn-secondary {
+    @apply px-4 py-2 bg-white text-secondary-700 border border-secondary-300 rounded-lg font-medium hover:bg-secondary-50 transition-all duration-200 dark:bg-secondary-800 dark:text-secondary-200 dark:border-secondary-700 dark:hover:bg-secondary-700;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-2 rounded-lg border border-secondary-300 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none transition-all duration-200 dark:bg-secondary-800 dark:border-secondary-700 dark:text-white dark:focus:border-primary-400;
+  }
+
+  .glass-sidebar {
+    @apply bg-white/80 backdrop-blur-md border-r border-secondary-200 dark:bg-secondary-900/80 dark:border-secondary-800;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-secondary-300 rounded-full hover:bg-secondary-400 transition-colors;
+}
