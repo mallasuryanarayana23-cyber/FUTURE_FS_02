@@ -8,7 +8,9 @@ import {
   LogOut,
   ChevronRight,
   TrendingUp,
-  X
+  X,
+  Kanban,
+  History
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
@@ -16,10 +18,12 @@ const Sidebar = ({ isOpen, onClose }) => {
   const { logout } = useAuth();
 
   const navItems = [
-    { name: 'Dashboard', icon: LayoutDashboard, path: '/' },
+    { name: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
     { name: 'Leads', icon: Users, path: '/leads' },
+    { name: 'Kanban Board', icon: Kanban, path: '/kanban' },
     { name: 'Analytics', icon: TrendingUp, path: '/analytics' },
     { name: 'Calendar', icon: Calendar, path: '/calendar' },
+    { name: 'Activity Logs', icon: History, path: '/activity-logs' },
     { name: 'Settings', icon: Settings, path: '/settings' },
   ];
 

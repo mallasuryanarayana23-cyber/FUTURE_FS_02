@@ -89,11 +89,11 @@ const LeadDetails = () => {
     }
   };
 
-  if (loading) return <div className="p-8 ml-64 text-center">Loading lead details...</div>;
+  if (loading) return <div className="p-8 text-center dark:text-white">Loading lead details...</div>;
   if (!lead) return null;
 
   return (
-    <div className="p-8 ml-64 bg-secondary-50 min-h-[calc(100vh-80px)]">
+    <div className="p-8 bg-secondary-50 min-h-[calc(100vh-80px)]">
       <button 
         onClick={() => navigate('/leads')}
         className="flex items-center gap-2 text-secondary-500 hover:text-secondary-900 transition-colors mb-6 font-medium"

@@ -70,7 +70,7 @@ const Settings = () => {
   };
 
   return (
-    <div className="p-8 ml-64 bg-secondary-50 min-h-[calc(100vh-80px)]">
+    <div className="p-8 bg-secondary-50 min-h-[calc(100vh-80px)]">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-secondary-950">System Settings</h1>
         <p className="text-secondary-500 mt-1">Manage your account preferences and security settings.</p>

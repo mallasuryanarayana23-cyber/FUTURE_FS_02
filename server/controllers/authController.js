@@ -69,6 +69,14 @@ const getMe = async (req, res) => {
   res.status(200).json(req.admin);
 };
 
+// @desc    Get all admins
+// @route   GET /api/auth/admins
+// @access  Private
+const getAdmins = async (req, res) => {
+  const admins = await Admin.find({}, 'name email');
+  res.status(200).json(admins);
+};
+
 // @desc    Update admin profile
 // @route   PUT /api/auth/me
 // @access  Private
@@ -108,5 +116,6 @@ module.exports = {
   registerAdmin,
   loginAdmin,
   getMe,
+  getAdmins,
   updateAdmin,
 };

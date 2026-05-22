@@ -42,8 +42,21 @@ const leadSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['New', 'Contacted', 'Qualified', 'Converted', 'Closed'],
+    enum: ['New', 'Contacted', 'Qualified', 'Proposal Sent', 'Negotiation', 'Converted', 'Closed', 'Lost'],
     default: 'New',
+  },
+  priority: {
+    type: String,
+    enum: ['Low', 'Medium', 'High'],
+    default: 'Medium',
+  },
+  assignedAdmin: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Admin',
+  },
+  tags: {
+    type: [String],
+    default: [],
   },
   notes: [noteSchema],
   followUpDate: {

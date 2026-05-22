@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Save, User, Mail, Phone, Building2, Calendar, Send } from 'lucide-react';
+import { X, Save, User, Mail, Phone, Building2, Calendar, Send, ShieldAlert, Tag, Users } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import api from '../services/api';
 
@@ -11,9 +11,27 @@ const LeadModal = ({ isOpen, onClose, lead, onSave }) => {
     company: '',
     source: 'Website Contact Form',
     status: 'New',
+    priority: 'Medium',
+    tags: '',
     followUpDate: '',
+    assignedAdmin: '',
   });
+  const [admins, setAdmins] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchAdmins = async () => {
+      try {
+        const response = await api.get('/auth/admins');
+        setAdmins(response.data);
+      } catch (error) {
+        console.error('Error fetching admins:', error);
+      }
+    };
+    if (isOpen) {
+      fetchAdmins();
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     if (lead) {
@@ -24,7 +42,10 @@ const LeadModal = ({ isOpen, onClose, lead, onSave }) => {
         company: lead.company || '',
         source: lead.source || 'Website Contact Form',
         status: lead.status || 'New',
+        priority: lead.priority || 'Medium',
+        tags: lead.tags ? lead.tags.join(', ') : '',
         followUpDate: lead.followUpDate ? new Date(lead.followUpDate).toISOString().split('T')[0] : '',
+        assignedAdmin: lead.assignedAdmin?._id || lead.assignedAdmin || '',
       });
     } else {
       setFormData({
@@ -34,7 +55,10 @@ const LeadModal = ({ isOpen, onClose, lead, onSave }) => {
         company: '',
         source: 'Website Contact Form',
         status: 'New',
+        priority: 'Medium',
+        tags: '',
         followUpDate: '',
+        assignedAdmin: '',
       });
     }
   }, [lead, isOpen]);
@@ -44,13 +68,20 @@ const LeadModal = ({ isOpen, onClose, lead, onSave }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+
+    const payload = {
+      ...formData,
+      tags: formData.tags ? formData.tags.split(',').map(t => t.trim()).filter(Boolean) : [],
+      assignedAdmin: formData.assignedAdmin || undefined
+    };
+
     try {
       if (lead) {
-        const response = await api.put(`/leads/${lead._id}`, formData);
+        const response = await api.put(`/leads/${lead._id}`, payload);
         toast.success('Lead updated successfully');
         onSave(response.data);
       } else {
-        const response = await api.post('/leads', formData);
+        const response = await api.post('/leads', payload);
         toast.success('Lead created successfully');
         onSave(response.data);
       }
@@ -68,107 +99,154 @@ const LeadModal = ({ isOpen, onClose, lead, onSave }) => {
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-secondary-950/40 backdrop-blur-sm">
-      <div className="bg-white w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
-        <div className="p-6 border-b border-secondary-100 flex justify-between items-center bg-secondary-50/50">
+      <div className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200 dark:bg-secondary-900 border border-secondary-100 dark:border-secondary-800">
+        <div className="p-6 border-b border-secondary-100 dark:border-secondary-800 flex justify-between items-center bg-secondary-50/50 dark:bg-secondary-900/50">
           <div>
-            <h2 className="text-xl font-bold text-secondary-900">{lead ? 'Edit Lead' : 'Create New Lead'}</h2>
-            <p className="text-xs text-secondary-500 mt-0.5">Fill in the information below to manage your contact.</p>
+            <h2 className="text-xl font-bold text-secondary-900 dark:text-white">{lead ? 'Edit Lead' : 'Create New Lead'}</h2>
+            <p className="text-xs text-secondary-500 mt-0.5 dark:text-secondary-400">Fill in the information below to manage your contact.</p>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-secondary-200 rounded-full transition-colors">
-            <X size={20} className="text-secondary-500" />
+          <button onClick={onClose} className="p-2 hover:bg-secondary-200 dark:hover:bg-secondary-850 rounded-full transition-colors">
+            <X size={20} className="text-secondary-500 dark:text-secondary-400" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-8 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <label className="text-sm font-bold text-secondary-700 flex items-center gap-2">
+              <label className="text-sm font-bold text-secondary-700 flex items-center gap-2 dark:text-secondary-300">
                 <User size={14} className="text-primary-600" /> Full Name
               </label>
               <input
                 type="text"
                 name="name"
                 required
-                className="input-field"
+                className="input-field dark:bg-secondary-850 dark:border-secondary-800 dark:text-white"
                 placeholder="e.g. John Doe"
                 value={formData.name}
                 onChange={handleChange}
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-bold text-secondary-700 flex items-center gap-2">
+              <label className="text-sm font-bold text-secondary-700 flex items-center gap-2 dark:text-secondary-300">
                 <Mail size={14} className="text-primary-600" /> Email Address
               </label>
               <input
                 type="email"
                 name="email"
                 required
-                className="input-field"
+                className="input-field dark:bg-secondary-850 dark:border-secondary-800 dark:text-white"
                 placeholder="john@example.com"
                 value={formData.email}
                 onChange={handleChange}
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-bold text-secondary-700 flex items-center gap-2">
+              <label className="text-sm font-bold text-secondary-700 flex items-center gap-2 dark:text-secondary-300">
                 <Phone size={14} className="text-primary-600" /> Phone Number
               </label>
               <input
                 type="text"
                 name="phone"
                 required
-                className="input-field"
+                className="input-field dark:bg-secondary-850 dark:border-secondary-800 dark:text-white"
                 placeholder="+1 234 567 890"
                 value={formData.phone}
                 onChange={handleChange}
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-bold text-secondary-700 flex items-center gap-2">
+              <label className="text-sm font-bold text-secondary-700 flex items-center gap-2 dark:text-secondary-300">
                 <Building2 size={14} className="text-primary-600" /> Company Name
               </label>
               <input
                 type="text"
                 name="company"
                 required
-                className="input-field"
+                className="input-field dark:bg-secondary-850 dark:border-secondary-800 dark:text-white"
                 placeholder="Tech Solutions Inc."
                 value={formData.company}
                 onChange={handleChange}
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-bold text-secondary-700 flex items-center gap-2">
+              <label className="text-sm font-bold text-secondary-700 flex items-center gap-2 dark:text-secondary-300">
                 <Send size={14} className="text-primary-600" /> Lead Source
               </label>
               <select
                 name="source"
-                className="input-field"
+                className="input-field dark:bg-secondary-850 dark:border-secondary-800 dark:text-white"
                 value={formData.source}
                 onChange={handleChange}
               >
                 <option value="Website Contact Form">Website Contact Form</option>
                 <option value="LinkedIn">LinkedIn</option>
                 <option value="Referral">Referral</option>
-                <option value="Cold Email">Cold Email</option>
-                <option value="Inbound Call">Inbound Call</option>
+                <option value="Email Campaign">Email Campaign</option>
+                <option value="Cold Outreach">Cold Outreach</option>
+                <option value="Other">Other</option>
               </select>
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-bold text-secondary-700 flex items-center gap-2">
+              <label className="text-sm font-bold text-secondary-700 flex items-center gap-2 dark:text-secondary-300">
+                <ShieldAlert size={14} className="text-primary-600" /> Priority Level
+              </label>
+              <select
+                name="priority"
+                className="input-field dark:bg-secondary-850 dark:border-secondary-800 dark:text-white"
+                value={formData.priority}
+                onChange={handleChange}
+              >
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+              </select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-secondary-700 flex items-center gap-2 dark:text-secondary-300">
+                <Users size={14} className="text-primary-600" /> Assigned Admin
+              </label>
+              <select
+                name="assignedAdmin"
+                className="input-field dark:bg-secondary-850 dark:border-secondary-800 dark:text-white"
+                value={formData.assignedAdmin}
+                onChange={handleChange}
+              >
+                <option value="">Select Admin (Defaults to Creator)</option>
+                {admins.map(adm => (
+                  <option key={adm._id} value={adm._id}>
+                    {adm.name} ({adm.email})
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-secondary-700 flex items-center gap-2 dark:text-secondary-300">
+                <Tag size={14} className="text-primary-600" /> Tags (Comma Separated)
+              </label>
+              <input
+                type="text"
+                name="tags"
+                className="input-field dark:bg-secondary-850 dark:border-secondary-800 dark:text-white"
+                placeholder="SaaS, Corporate, Enterprise"
+                value={formData.tags}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="space-y-2 md:col-span-2">
+              <label className="text-sm font-bold text-secondary-700 flex items-center gap-2 dark:text-secondary-300">
                 <Calendar size={14} className="text-primary-600" /> Follow-up Date
               </label>
               <input
                 type="date"
                 name="followUpDate"
-                className="input-field"
+                className="input-field dark:bg-secondary-850 dark:border-secondary-800 dark:text-white"
                 value={formData.followUpDate}
                 onChange={handleChange}
               />
             </div>
           </div>
 
-          <div className="pt-6 border-t border-secondary-100 flex justify-end gap-3">
+          <div className="pt-6 border-t border-secondary-100 dark:border-secondary-800 flex justify-end gap-3">
             <button
               type="button"
               onClick={onClose}

@@ -33,7 +33,7 @@ const Calendar = () => {
   ];
 
   return (
-    <div className="p-8 ml-64 bg-secondary-50 min-h-[calc(100vh-80px)]">
+    <div className="p-8 bg-secondary-50 min-h-[calc(100vh-80px)]">
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold text-secondary-950">Follow-up Calendar</h1>

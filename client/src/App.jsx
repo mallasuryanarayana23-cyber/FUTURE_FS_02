@@ -4,6 +4,7 @@ import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Sidebar from './components/layout/Sidebar';
 import Navbar from './components/layout/Navbar';
+import LandingPage from './pages/LandingPage';
 import Dashboard from './pages/Dashboard';
 import Leads from './pages/Leads';
 import LeadDetails from './pages/LeadDetails';
@@ -11,6 +12,9 @@ import Analytics from './pages/Analytics';
 import Settings from './pages/Settings';
 import Calendar from './pages/Calendar';
 import Login from './pages/Login';
+import Register from './pages/Register';
+import Kanban from './pages/Kanban';
+import ActivityLogs from './pages/ActivityLogs';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const ProtectedRoute = ({ children }) => {
@@ -45,56 +49,74 @@ function App() {
         <Toaster position="top-right" />
         <AnimatePresence mode="wait">
           <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route 
-            path="/" 
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/leads" 
-            element={
-              <ProtectedRoute>
-                <Leads />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/leads/:id" 
-            element={
-              <ProtectedRoute>
-                <LeadDetails />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/analytics" 
-            element={
-              <ProtectedRoute>
-                <Analytics />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/settings" 
-            element={
-              <ProtectedRoute>
-                <Settings />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/calendar" 
-            element={
-              <ProtectedRoute>
-                <Calendar />
-              </ProtectedRoute>
-            } 
-          />
-        </Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route 
+              path="/dashboard" 
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/leads" 
+              element={
+                <ProtectedRoute>
+                  <Leads />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/leads/:id" 
+              element={
+                <ProtectedRoute>
+                  <LeadDetails />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/kanban" 
+              element={
+                <ProtectedRoute>
+                  <Kanban />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/analytics" 
+              element={
+                <ProtectedRoute>
+                  <Analytics />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/activity-logs" 
+              element={
+                <ProtectedRoute>
+                  <ActivityLogs />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/settings" 
+              element={
+                <ProtectedRoute>
+                  <Settings />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/calendar" 
+              element={
+                <ProtectedRoute>
+                  <Calendar />
+                </ProtectedRoute>
+              } 
+            />
+          </Routes>
         </AnimatePresence>
       </Router>
     </AuthProvider>
