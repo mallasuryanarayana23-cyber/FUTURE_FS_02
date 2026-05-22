@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   User, 
   Lock, 
@@ -29,13 +29,58 @@ const Settings = () => {
   const [formData, setFormData] = useState({
     name: admin?.name || '',
     email: admin?.email || '',
+    profilePicture: admin?.profilePicture || '',
+    jobTitle: admin?.jobTitle || '',
+    department: admin?.department || '',
     currentPassword: '',
     newPassword: '',
     confirmPassword: '',
   });
 
+  useEffect(() => {
+    if (admin) {
+      setFormData(prev => ({
+        ...prev,
+        name: admin.name || '',
+        email: admin.email || '',
+        profilePicture: admin.profilePicture || '',
+        jobTitle: admin.jobTitle || '',
+        department: admin.department || '',
+      }));
+    }
+  }, [admin]);
+
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handlePhotoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        toast.error('Image size must be less than 2MB');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData(prev => ({
+          ...prev,
+          profilePicture: reader.result
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemovePhoto = () => {
+    setFormData(prev => ({
+      ...prev,
+      profilePicture: ''
+    }));
+    const fileInput = document.getElementById('photo-upload');
+    if (fileInput) {
+      fileInput.value = '';
+    }
   };
 
   const handleSave = async (e) => {
@@ -52,7 +97,10 @@ const Settings = () => {
       const response = await api.put('/auth/me', {
         name: formData.name,
         email: formData.email,
-        password: formData.newPassword || undefined
+        password: formData.newPassword || undefined,
+        profilePicture: formData.profilePicture,
+        jobTitle: formData.jobTitle,
+        department: formData.department
       });
 
       // Update local storage if token changed
@@ -103,19 +151,52 @@ const Settings = () => {
               <div className="p-8 space-y-8">
                 <div className="flex items-center gap-6">
                   <div className="relative group">
-                    <div className="w-24 h-24 bg-secondary-100 rounded-3xl flex items-center justify-center text-secondary-400 border-2 border-dashed border-secondary-300">
-                      <User size={40} />
+                    <div className="w-24 h-24 bg-secondary-100 rounded-3xl flex items-center justify-center text-secondary-400 border border-secondary-200 overflow-hidden">
+                      {formData.profilePicture ? (
+                        <img 
+                          src={formData.profilePicture} 
+                          alt="Profile Preview" 
+                          className="w-full h-full object-cover animate-in fade-in duration-200"
+                        />
+                      ) : (
+                        <User size={40} />
+                      )}
                     </div>
-                    <button className="absolute -bottom-2 -right-2 p-2 bg-primary-600 text-white rounded-xl shadow-lg hover:bg-primary-700 transition-colors">
+                    <button 
+                      type="button"
+                      onClick={() => document.getElementById('photo-upload').click()}
+                      className="absolute -bottom-2 -right-2 p-2 bg-primary-600 text-white rounded-xl shadow-lg hover:bg-primary-700 transition-colors cursor-pointer"
+                    >
                       <Camera size={16} />
                     </button>
+                    <input 
+                      type="file" 
+                      id="photo-upload" 
+                      accept="image/*" 
+                      className="hidden" 
+                      onChange={handlePhotoChange}
+                    />
                   </div>
                   <div>
                     <h3 className="font-bold text-secondary-900 text-lg">Your Photo</h3>
                     <p className="text-sm text-secondary-500 mt-1">This will be displayed on your profile and dashboard.</p>
                     <div className="flex gap-3 mt-3">
-                      <button className="text-xs font-bold text-primary-600 hover:underline">Upload New</button>
-                      <button className="text-xs font-bold text-red-500 hover:underline">Remove</button>
+                      <button 
+                        type="button"
+                        onClick={() => document.getElementById('photo-upload').click()}
+                        className="text-xs font-bold text-primary-600 hover:underline cursor-pointer"
+                      >
+                        Upload New
+                      </button>
+                      {formData.profilePicture && (
+                        <button 
+                          type="button"
+                          onClick={handleRemovePhoto}
+                          className="text-xs font-bold text-red-500 hover:underline cursor-pointer"
+                        >
+                          Remove
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -143,11 +224,25 @@ const Settings = () => {
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-bold text-secondary-700">Job Title</label>
-                    <input type="text" className="input-field" defaultValue="Senior Administrator" />
+                    <input 
+                      type="text" 
+                      name="jobTitle"
+                      className="input-field" 
+                      value={formData.jobTitle} 
+                      onChange={handleInputChange}
+                      placeholder="Senior Administrator"
+                    />
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-bold text-secondary-700">Department</label>
-                    <input type="text" className="input-field" defaultValue="Sales Operations" />
+                    <input 
+                      type="text" 
+                      name="department"
+                      className="input-field" 
+                      value={formData.department} 
+                      onChange={handleInputChange}
+                      placeholder="Sales Operations"
+                    />
                   </div>
                 </div>
 

@@ -56,6 +56,20 @@ const LeadDetails = () => {
     }
   };
 
+  const handleToggleFollowUpStatus = async () => {
+    try {
+      setUpdating(true);
+      const newStatus = lead.followUpStatus === 'Completed' ? 'Pending' : 'Completed';
+      const response = await api.put(`/leads/${id}`, { followUpStatus: newStatus });
+      setLead(response.data);
+      toast.success(`Follow-up marked as ${newStatus}`);
+    } catch (error) {
+      toast.error('Failed to update follow-up status');
+    } finally {
+      setUpdating(false);
+    }
+  };
+
   const handleDelete = async () => {
     if (window.confirm('Are you sure you want to delete this lead?')) {
       try {
@@ -214,15 +228,43 @@ const LeadDetails = () => {
                   {lead.followUpDate ? format(new Date(lead.followUpDate), 'MMMM dd, yyyy') : 'No date set'}
                 </p>
               </div>
-              <div className="flex items-center justify-between p-4 bg-secondary-50 border border-secondary-100 rounded-xl">
+              <div className={`flex items-center justify-between p-4 border rounded-xl transition-all duration-200 ${
+                lead.followUpStatus === 'Completed'
+                  ? 'bg-emerald-50 border-emerald-100 text-emerald-800'
+                  : lead.followUpStatus === 'Overdue'
+                  ? 'bg-rose-50 border-rose-100 text-rose-800'
+                  : 'bg-amber-50 border-amber-100 text-amber-800'
+              }`}>
                 <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></div>
-                  <span className="text-sm font-semibold text-secondary-700">{lead.followUpStatus}</span>
+                  <div className={`w-2.5 h-2.5 rounded-full ${
+                    lead.followUpStatus === 'Completed'
+                      ? 'bg-emerald-500'
+                      : lead.followUpStatus === 'Overdue'
+                      ? 'bg-rose-500 animate-pulse'
+                      : 'bg-amber-500 animate-pulse'
+                  }`}></div>
+                  <span className="text-sm font-bold capitalize">
+                    {lead.followUpStatus || 'Pending'}
+                  </span>
                 </div>
-                <button className="text-xs font-bold text-primary-600 hover:underline">Change</button>
+                <button 
+                  onClick={() => setIsModalOpen(true)}
+                  className="text-xs font-bold text-primary-600 hover:text-primary-700 hover:underline"
+                >
+                  Change
+                </button>
               </div>
-              <button className="w-full btn-secondary py-3 flex items-center justify-center gap-2">
-                <CheckCircle2 size={18} /> Mark as Completed
+              <button 
+                onClick={handleToggleFollowUpStatus}
+                disabled={updating || !lead.followUpDate}
+                className={`w-full py-3 flex items-center justify-center gap-2 font-bold text-sm rounded-xl transition-all duration-200 ${
+                  lead.followUpStatus === 'Completed'
+                    ? 'bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 cursor-pointer'
+                    : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-100 cursor-pointer disabled:opacity-55 disabled:cursor-not-allowed'
+                }`}
+              >
+                <CheckCircle2 size={18} />
+                {lead.followUpStatus === 'Completed' ? 'Reopen Follow-up' : 'Mark as Completed'}
               </button>
             </div>
           </div>

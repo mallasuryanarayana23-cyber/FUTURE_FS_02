@@ -21,14 +21,26 @@ const adminSchema = new mongoose.Schema({
     minlength: 6,
     select: false,
   },
+  profilePicture: {
+    type: String,
+    default: '',
+  },
+  jobTitle: {
+    type: String,
+    default: 'Senior Administrator',
+  },
+  department: {
+    type: String,
+    default: 'Sales Operations',
+  },
 }, {
   timestamps: true,
 });
 
 // Encrypt password using bcrypt
-adminSchema.pre('save', async function (next) {
+adminSchema.pre('save', async function () {
   if (!this.isModified('password')) {
-    next();
+    return;
   }
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);

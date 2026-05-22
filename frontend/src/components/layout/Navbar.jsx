@@ -153,8 +153,16 @@ const Navbar = ({ onMenuClick }) => {
             <p className="text-sm font-semibold text-secondary-950 dark:text-white">{admin?.name}</p>
             <p className="text-xs text-secondary-500 dark:text-secondary-400">Administrator</p>
           </div>
-          <div className="w-10 h-10 bg-secondary-100 dark:bg-secondary-800 rounded-xl flex items-center justify-center text-secondary-600 dark:text-secondary-300 group-hover:bg-primary-50 dark:group-hover:bg-primary-950/30 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-all border border-secondary-200 dark:border-secondary-700">
-            <User size={20} />
+          <div className="w-10 h-10 bg-secondary-100 dark:bg-secondary-800 rounded-xl flex items-center justify-center text-secondary-600 dark:text-secondary-300 group-hover:bg-primary-50 dark:group-hover:bg-primary-950/30 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-all border border-secondary-200 dark:border-secondary-700 overflow-hidden">
+            {admin?.profilePicture ? (
+              <img 
+                src={admin.profilePicture} 
+                alt={admin.name} 
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <User size={20} />
+            )}
           </div>
         </div>
       </div>

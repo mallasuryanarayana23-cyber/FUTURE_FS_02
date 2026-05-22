@@ -144,6 +144,7 @@ const updateLead = async (req, res) => {
 
   const oldStatus = lead.status;
   const oldFollowUpDate = lead.followUpDate;
+  const oldFollowUpStatus = lead.followUpStatus;
 
   const updatedLead = await Lead.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
@@ -197,6 +198,37 @@ const updateLead = async (req, res) => {
       action: 'Follow-Up Scheduled',
       description: `Scheduled a new follow-up touchpoint for ${lead.name} on ${new Date(req.body.followUpDate).toDateString()}`
     });
+  }
+
+  // Handle follow up status updates
+  if (req.body.followUpStatus && req.body.followUpStatus !== oldFollowUpStatus) {
+    if (req.body.followUpStatus === 'Completed') {
+      await FollowUp.updateMany(
+        { leadId: lead._id, status: 'Pending' },
+        { status: 'Completed' }
+      );
+
+      await Activity.create({
+        leadId: lead._id,
+        adminId: req.admin._id,
+        adminName: req.admin.name,
+        action: 'Follow-Up Completed',
+        description: `Marked follow-up as Completed for ${lead.name}`
+      });
+    } else if (req.body.followUpStatus === 'Pending') {
+      await FollowUp.updateMany(
+        { leadId: lead._id, status: 'Completed' },
+        { status: 'Pending' }
+      );
+
+      await Activity.create({
+        leadId: lead._id,
+        adminId: req.admin._id,
+        adminName: req.admin.name,
+        action: 'Follow-Up Reopened',
+        description: `Reopened follow-up for ${lead.name}`
+      });
+    }
   }
 
   res.status(200).json(updatedLead);

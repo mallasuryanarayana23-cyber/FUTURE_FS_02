@@ -32,6 +32,9 @@ const registerAdmin = async (req, res) => {
       _id: admin.id,
       name: admin.name,
       email: admin.email,
+      profilePicture: admin.profilePicture,
+      jobTitle: admin.jobTitle,
+      department: admin.department,
       token: generateToken(admin._id),
     });
   } else {
@@ -54,6 +57,9 @@ const loginAdmin = async (req, res) => {
       _id: admin.id,
       name: admin.name,
       email: admin.email,
+      profilePicture: admin.profilePicture,
+      jobTitle: admin.jobTitle,
+      department: admin.department,
       token: generateToken(admin._id),
     });
   } else {
@@ -86,6 +92,9 @@ const updateAdmin = async (req, res) => {
   if (admin) {
     admin.name = req.body.name || admin.name;
     admin.email = req.body.email || admin.email;
+    admin.profilePicture = req.body.profilePicture !== undefined ? req.body.profilePicture : admin.profilePicture;
+    admin.jobTitle = req.body.jobTitle !== undefined ? req.body.jobTitle : admin.jobTitle;
+    admin.department = req.body.department !== undefined ? req.body.department : admin.department;
     
     if (req.body.password) {
       admin.password = req.body.password;
@@ -97,6 +106,9 @@ const updateAdmin = async (req, res) => {
       _id: updatedAdmin._id,
       name: updatedAdmin.name,
       email: updatedAdmin.email,
+      profilePicture: updatedAdmin.profilePicture,
+      jobTitle: updatedAdmin.jobTitle,
+      department: updatedAdmin.department,
       token: generateToken(updatedAdmin._id),
     });
   } else {
