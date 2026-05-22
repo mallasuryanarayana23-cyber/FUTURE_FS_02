@@ -117,6 +117,31 @@ const updateAdmin = async (req, res) => {
   }
 };
 
+// @desc    Forgot/Reset password
+// @route   POST /api/auth/forgot-password
+// @access  Public
+const forgotPassword = async (req, res) => {
+  const { email, newPassword } = req.body;
+
+  if (!email || !newPassword) {
+    res.status(400);
+    throw new Error('Please add all fields');
+  }
+
+  // Find admin by email
+  const admin = await Admin.findOne({ email });
+
+  if (!admin) {
+    res.status(404);
+    throw new Error('Admin email not found');
+  }
+
+  admin.password = newPassword;
+  await admin.save();
+
+  res.status(200).json({ message: 'Password reset successfully' });
+};
+
 // Generate JWT
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -130,4 +155,5 @@ module.exports = {
   getMe,
   getAdmins,
   updateAdmin,
+  forgotPassword,
 };
