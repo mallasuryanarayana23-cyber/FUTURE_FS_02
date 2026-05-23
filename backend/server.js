@@ -22,21 +22,20 @@ if (process.env.NODE_ENV === 'production') {
     contentSecurityPolicy: false,
   }));
 }
-// CORS Configuration - allow deployed Vercel frontend and local dev
-const allowedOrigins = [
-  'https://future-fs-02-sigma-one.vercel.app',
-  'http://localhost:5173',
-  'http://localhost:3000',
-];
-
+// CORS Configuration - allow all Vercel deployments (preview + production) and local dev
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (mobile apps, curl, Postman)
+    // Allow requests with no origin (Postman, curl, mobile apps)
     if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) !== -1) {
+
+    const isVercel = /^https:\/\/.*\.vercel\.app$/.test(origin);
+    const isLocalhost = /^http:\/\/localhost:\d+$/.test(origin);
+
+    if (isVercel || isLocalhost) {
       return callback(null, true);
     }
-    return callback(new Error('Not allowed by CORS'));
+
+    return callback(new Error(`CORS: origin ${origin} not allowed`));
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
