@@ -13,24 +13,18 @@ connectDB();
 
 const app = express();
 
-// ─── CORS must come BEFORE helmet and all other middleware ───────────────────
-// We use JWT Bearer tokens (not cookies), so origin:'*' is safe here
-const corsOptions = {
-  origin: '*',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-};
-
-app.use(cors(corsOptions));
+// ─── Manual CORS headers (works with Express 5, bypasses all package issues) ──
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  // Respond immediately to preflight OPTIONS requests
+  if (req.method === 'OPTIONS') {
+    return res.status(204).end();
+  }
+  next();
+});
 // ─────────────────────────────────────────────────────────────────────────────
-
-// Security headers (after CORS so it doesn't interfere with preflight)
-if (process.env.NODE_ENV === 'production') {
-  app.use(helmet({ crossOriginResourcePolicy: false }));
-} else {
-  app.use(helmet({ contentSecurityPolicy: false, crossOriginResourcePolicy: false }));
-}
-
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: false }));
 app.use(morgan('dev'));
